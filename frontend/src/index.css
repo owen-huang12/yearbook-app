@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=Reem+Kufi:wght@400..700&display=swap');
+
+* {
+  box-sizing: border-box;
+  /* font-family: "Reem Kufi", sans-serif; */
+}
+
+h1, h3 {
+  font-family: "Reem Kufi", sans-serif;
+  font-weight: 500;
+}
+
+p {
+  font-family: "Raleway", sans-serif;
+  font-weight: 400;
+}
+
+.profile{
+  display: flex;
+  width: 722px;
+  height: 67px;
+  align-items: center;
+  justify-content: left;
+  background: #EDF7FF;
+  padding: 29px;
+  gap: 43px;
+}
+
+.profile-name{
+  width: 100px
+}
+
+.profile-id{
+  width: 100px
+}
+
+.profile-status{
+  width: 90px;
+}
