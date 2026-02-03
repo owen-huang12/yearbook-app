@@ -32,6 +32,7 @@ export default function App(){
     }).then(res => res.json())
       .then(data => setResponse(data.message))
       .then(fetchAllStudents)
+      .then(() => setStudentIDsearch(""))
   }
 
   return (
