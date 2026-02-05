@@ -18,8 +18,22 @@ export default function App(){
       .then(data => setStudentDisplayInformation(data.data))
   }
 
-  const handleSubmit = (event) => {
+  const handleClaimed = (event) => {
     event.preventDefault()
+
+    const idToUpdate = studentIDsearch
+    
+    setStudentDisplayInformation(prev => {
+      return prev.map(student => {
+        return student.studentID.toString() === idToUpdate.toString() 
+          ? { ...student, status: "claimed" }
+          : student
+      })
+    })
+
+    setResponse(`Student ${studentIDsearch} marked as claimed`)
+    setStudentIDsearch("")
+
     fetch("http://localhost:3002/api/edit-status", {
       method: "POST",
       headers: {
@@ -29,15 +43,75 @@ export default function App(){
         studentID: studentIDsearch,
         status: "claimed",
       }),
-    }).then(res => res.json())
-      .then(data => setResponse(data.message))
-      .then(fetchAllStudents)
+    }).catch(error => {
+      console.log("Failed to save", error);
+      setResponse("ERROR SAVING - PLEASE REFRESH");
+    })
+  }
+
+  const updateStudentStatus = (studentID, newStatus) => {
+    
+    setStudentDisplayInformation(prev => {
+      return prev.map(student => {
+        return student.studentID.toString() === studentID.toString() 
+          ? { ...student, status: newStatus }
+          : student
+      })
+    })
+
+    setResponse(`Student ${studentID} marked as ${newStatus}`)
+    fetch("http://localhost:3002/api/edit-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ studentID, status: newStatus }),
+    }).catch(error => {
+      setResponse("ERROR SAVING - PLEASE REFRESH")
+    })
+  }
+
+  const handleSubmit = (event) => {
+    const idToUpdate = studentIDsearch
+
+    event.preventDefault()
+    updateStudentStatus(idToUpdate, "claimed")
+    setStudentIDsearch("")
+  }
+
+  const handlePurchased = (event) => {
+    event.preventDefault()
+
+    const idToUpdate = studentIDsearch
+    
+    setStudentDisplayInformation(prev => {
+      return prev.map(student => {
+        return student.studentID.toString() === idToUpdate.toString() 
+          ? { ...student, status: "claimed" }
+          : student
+      })
+    })
+
+    setResponse(`Student ${studentIDsearch} marked as claimed`)
+    setStudentIDsearch("")
+
+    fetch("http://localhost:3002/api/edit-status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        studentID: studentIDsearch,
+        status: "purchased",
+      }),
+    }).catch(error => {
+      console.log("Failed to save", error);
+      setResponse("ERROR SAVING - PLEASE REFRESH");
+    })
   }
 
   return (
     <>
       <header>
-        <h1>Tutorial center distribution app</h1>
+        <h1>Yearbook distribution app</h1>
       </header>
       <div className="handout-information-wrapper">
         <h3>HANDOUT YEARBOOK</h3>
@@ -54,13 +128,14 @@ export default function App(){
       </div>
       <div className="display-information-wrapper">
         <h3>DISTRIBUTION INFORMATION</h3>
+        <div className="results-info">
+          <p>{response}</p>
+        </div>
         {studentDisplayInformation?.map((student) => (
-          <Profile {...student} />
+          <Profile key={student.studentID} {...student} update={updateStudentStatus} />
         ))}
       </div>
-      <div className="results-info">
-        <p>{response}</p>
-      </div>
+      
     </>
   )
 }
