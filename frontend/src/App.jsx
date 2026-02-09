@@ -18,37 +18,6 @@ export default function App(){
       .then(data => setStudentDisplayInformation(data.data))
   }
 
-  const handleClaimed = (event) => {
-    event.preventDefault()
-
-    const idToUpdate = studentIDsearch
-    
-    setStudentDisplayInformation(prev => {
-      return prev.map(student => {
-        return student.studentID.toString() === idToUpdate.toString() 
-          ? { ...student, status: "claimed" }
-          : student
-      })
-    })
-
-    setResponse(`Student ${studentIDsearch} marked as claimed`)
-    setStudentIDsearch("")
-
-    fetch("http://localhost:3002/api/edit-status", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        studentID: studentIDsearch,
-        status: "claimed",
-      }),
-    }).catch(error => {
-      console.log("Failed to save", error);
-      setResponse("ERROR SAVING - PLEASE REFRESH");
-    })
-  }
-
   const updateStudentStatus = (studentID, newStatus) => {
     
     setStudentDisplayInformation(prev => {
@@ -75,37 +44,6 @@ export default function App(){
     event.preventDefault()
     updateStudentStatus(idToUpdate, "claimed")
     setStudentIDsearch("")
-  }
-
-  const handlePurchased = (event) => {
-    event.preventDefault()
-
-    const idToUpdate = studentIDsearch
-    
-    setStudentDisplayInformation(prev => {
-      return prev.map(student => {
-        return student.studentID.toString() === idToUpdate.toString() 
-          ? { ...student, status: "claimed" }
-          : student
-      })
-    })
-
-    setResponse(`Student ${studentIDsearch} marked as claimed`)
-    setStudentIDsearch("")
-
-    fetch("http://localhost:3002/api/edit-status", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        studentID: studentIDsearch,
-        status: "purchased",
-      }),
-    }).catch(error => {
-      console.log("Failed to save", error);
-      setResponse("ERROR SAVING - PLEASE REFRESH");
-    })
   }
 
   return (
