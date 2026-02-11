@@ -54,20 +54,22 @@ export default function App(){
       <div className="handout-information-wrapper">
         <h3>HANDOUT YEARBOOK</h3>
         <form onSubmit={handleSubmit}>
-          <input 
-            type = "text"
-            id = "student-id-field"
-            onChange={(event) => {setStudentIDsearch(event.target.value)}}
-            value={studentIDsearch}
-          />
-          <button type="submit">Submit</button>
+          <div className="center-container">
+            <input 
+              type = "text"
+              id = "student-id-field"
+              onChange={(event) => {setStudentIDsearch(event.target.value)}}
+              value={studentIDsearch}
+              autoComplete="off"
+            />
+          </div>
         </form>
-        <p>Enter the student ID of the student you are handing out the yearbook for either by scanning their ID bar with the scanner, or entering it manually.</p>
+        <p style={{textAlign: "center"}}>Enter the student ID of the student you are handing out the yearbook for either by scanning their ID bar with the scanner, or entering it manually.</p>
       </div>
       <div className="display-information-wrapper">
         <h3>DISTRIBUTION INFORMATION</h3>
         <div className="results-info">
-          <p>{response}</p>
+          <p style={{textAlign: "center"}}>{response}</p>
         </div>
         {studentDisplayInformation?.map((student) => (
           <Profile key={student.studentID} {...student} update={updateStudentStatus} />

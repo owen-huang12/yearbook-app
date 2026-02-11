@@ -8,6 +8,28 @@
 h1, h3 {
   font-family: "Reem Kufi", sans-serif;
   font-weight: 500;
+  text-align: center;
+
+}
+
+input{
+  width: 260px;
+  height: 44px;
+  padding: 10px 12px;
+  font-size: 20px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.center-container {
+  display: flex;
+  justify-content: center;
+}
+
+.display-information-wrapper{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 p {
@@ -17,11 +39,11 @@ p {
 
 .profile{
   display: flex;
-  width: 722px;
+  width: 1000px;
   height: 67px;
   align-items: center;
-  justify-content: left;
-  background: #EDF7FF;
+  justify-content: center;
+  background: #F0BA47;
   padding: 29px;
   gap: 43px;
 }
@@ -36,4 +58,44 @@ p {
 
 .profile-status{
   width: 90px;
+}
+
+.statusSelect {
+  font-family: "Raleway", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+
+  padding: 8px 14px;
+  border-radius: 999px;  /* pill shape */
+  border: 1px solid rgba(0,0,0,0.2);
+
+  background: rgba(255,255,255,0.85);
+  color: #111;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  cursor: pointer;
+  transition: box-shadow 0.12s ease, transform 0.12s ease, border-color 0.12s ease;
+}
+
+.statusSelect:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transform: translateY(-1px);
+}
+
+.statusSelect:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.45);
+}
+
+.statusSelect.claimed {
+  background: rgba(192, 252, 222, 0.92);
+  border-color: rgba(0, 140, 90, 0.35);
+}
+
+.statusSelect.purchased {
+  background: rgba(190, 217, 255, 0.92);
+  border-color: rgba(0, 90, 160, 0.35);
 }
