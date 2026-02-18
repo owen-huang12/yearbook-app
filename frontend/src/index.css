@@ -2,34 +2,17 @@
 
 * {
   box-sizing: border-box;
-  /* font-family: "Reem Kufi", sans-serif; */
+}
+
+body {
+  margin: 0;
+  padding: 0 0 24px;
 }
 
 h1, h3 {
   font-family: "Reem Kufi", sans-serif;
   font-weight: 500;
   text-align: center;
-
-}
-
-input{
-  width: 260px;
-  height: 44px;
-  padding: 10px 12px;
-  font-size: 20px;
-  border-radius: 6px;
-  text-align: center;
-}
-
-.center-container {
-  display: flex;
-  justify-content: center;
-}
-
-.display-information-wrapper{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 p {
@@ -37,26 +20,106 @@ p {
   font-weight: 400;
 }
 
-.profile{
+input {
+  width: 260px;
+  height: 44px;
+  padding: 10px 12px;
+  font-size: 20px;
+  border-radius: 6px;
+  text-align: center;
+  border: 1px solid #bbb;
+}
+
+.center-container {
   display: flex;
-  width: 1000px;
-  height: 67px;
+  justify-content: center;
+}
+
+header {
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: #F0BA47;
-  padding: 29px;
+  position: relative;
+}
+
+.logout-button {
+  position: absolute;
+  right: 24px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #222;
+  background: #fff;
+  cursor: pointer;
+}
+
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth-form {
+  width: min(360px, 95vw);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.auth-form input {
+  width: 100%;
+  font-size: 16px;
+  text-align: left;
+}
+
+.auth-form button {
+  height: 42px;
+  border-radius: 8px;
+  border: 0;
+  font-weight: 600;
+  cursor: pointer;
+  background: #1c5ac4;
+  color: #fff;
+}
+
+.auth-error {
+  margin: 0;
+  color: #b00020;
+  font-weight: 600;
+}
+
+.display-information-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile {
+  display: flex;
+  width: min(1000px, 96vw);
+  min-height: 67px;
+  align-items: center;
+  justify-content: center;
+  background: #f0ba47;
+  padding: 18px;
   gap: 43px;
 }
 
-.profile-name{
-  width: 100px
+.profile-name {
+  width: 140px;
 }
 
-.profile-id{
-  width: 100px
+.profile-id {
+  width: 120px;
 }
 
-.profile-status{
+.profile-status {
   width: 90px;
 }
 
@@ -64,30 +127,26 @@ p {
   font-family: "Raleway", sans-serif;
   font-size: 16px;
   font-weight: 500;
-
   padding: 8px 14px;
-  border-radius: 999px;  /* pill shape */
-  border: 1px solid rgba(0,0,0,0.2);
-
-  background: rgba(255,255,255,0.85);
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.85);
   color: #111;
-
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-
   cursor: pointer;
   transition: box-shadow 0.12s ease, transform 0.12s ease, border-color 0.12s ease;
 }
 
 .statusSelect:hover {
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   transform: translateY(-1px);
 }
 
 .statusSelect:focus {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(255,255,255,0.45);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.45);
 }
 
 .statusSelect.claimed {
