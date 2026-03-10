@@ -3,6 +3,14 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
+const { Pool } = require('pg');
+
+const DB_DATABASE_URL = process.env.DB_DATABASE_URL;
+
+const pool = new Pool({
+    connectionString: DB_DATABASE_URL,
+})
+
 const app = express();
 const PORT = 3002;
 
@@ -12,23 +20,40 @@ const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
 app.use(cors());
 app.use(express.json());
 
-app.get('/api/get', async (req, res) => {
+app.get('/api/get/:id', async (req, res) => {
     try{
-        const url = APPS_SCRIPT_URL + '?action=getall';
+        const studentId = req.params.id;
 
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type' : 'applications/json'
-            }
-        })
+        const result = await pool.query(
+            `SELECT * FROM checkIns JOIN allStudents ON checkIns.student_id = allStudents.student_id WHERE checkIns.id = $1`,
+            [studentId]
+        )
 
-        const text = await response.text();
-        console.log("Response status:", response.status);
-        console.log("Response from Google Apps Script:", text);
-        const data = JSON.parse(text);
+        if (result.rows.length === 0){
+            return res.status(404).json({error: 'Student not found'})
+        }
 
-        res.json(data)
+        res.json(result.rows[0])
+    } catch (error) {
+        console.log("Error", error);
+        res.status(500).json({error: 'Server Error'});
+    }
+})
+
+app.get('/api/get/namesearch/:name', async (req, res) => {
+    try{
+        const name = req.params.name;
+
+        const result = await pool.query(
+            `SELECT * FROM checkIns JOIN allStudents ON checkIns.student_id = allStudents.student_id WHERE allStudents.name ILIKE $1`,
+            [`%${name}%`]
+        )
+
+        if (result.rows.length === 0){
+            return res.status(404).json({error: 'No students found'})
+        }
+
+        res.json(result.rows)
     } catch (error) {
         console.log("Error", error);
         res.status(500).json({error: 'Server Error'});
@@ -37,21 +62,18 @@ app.get('/api/get', async (req, res) => {
 
 app.post('/api/edit-status', async (req, res) => {
     try{
-        const response = await fetch(APPS_SCRIPT_URL,  {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(req.body)   
-        })
+        const { student_id, is_handed_out, is_purchased } = req.body;
 
-        const text = await response.text();
-        console.log("Response status:", response.status);
-        console.log("Response from Google Apps Script:", text);
+        const result = await pool.query(
+            `UPDATE checkIns SET is_handed_out = $1, is_purchased = $2 WHERE student_id = $3 RETURNING *`,
+            [is_handed_out, is_purchased, student_id]
+        )
 
-        const data = JSON.parse(text);
+        if (result.rows.length === 0){
+            return res.status(404).json({error: 'Student not found'})
+        }
 
-        res.json(data)
+        res.json(result.rows[0])
     } catch (error) {
         console.log("Error", error);
         res.status(500).json({error: 'Server Error'})
