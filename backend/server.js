@@ -81,10 +81,7 @@ app.post('/api/logout', requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
-app.get('/api/get', requireAuth, async (req, res) => {
-  try {
-    const url = `${APPS_SCRIPT_URL}?action=getall`;
-app.get('/api/get/:id', async (req, res) => {
+app.get('/api/get/:id', requireAuthm, async (req, res) => {
     try{
         const studentId = req.params.id;
 
