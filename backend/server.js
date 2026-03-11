@@ -7,7 +7,6 @@ const crypto = require('crypto');
 const { Pool } = require('pg');
 
 const DB_DATABASE_URL = process.env.DB_DATABASE_URL;
-
 const pool = new Pool({
     connectionString: DB_DATABASE_URL,
 })
@@ -15,7 +14,6 @@ const pool = new Pool({
 const app = express();
 const PORT = 3002;
 
-const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
 const AUTH_USERNAME = process.env.AUTH_USERNAME;
 const AUTH_PASSWORD = process.env.AUTH_PASSWORD;
 const SESSION_TTL_MS = Number(process.env.SESSION_TTL_MS || 1000 * 60 * 60 * 8);
@@ -81,12 +79,31 @@ app.post('/api/logout', requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
-app.get('/api/get/:id', requireAuthm, async (req, res) => {
+app.get('/api/get', requireAuth, async (req, res) => {
+    try {
+        const result = await pool.query(
+            `SELECT student_id, name, is_handed_out, is_purchased FROM allStudents`
+        );
+
+        const data = result.rows.map(row => ({
+            studentID: row.student_id,
+            name: row.name,
+            status: row.is_handed_out ? 'claimed' : row.is_purchased ? 'purchased' : 'not purchased',
+        }));
+
+        res.json({ data });
+    } catch (error) {
+        console.log("Error", error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
+app.get('/api/get/:id', requireAuth, async (req, res) => {
     try{
         const studentId = req.params.id;
 
         const result = await pool.query(
-            `SELECT * FROM checkIns JOIN allStudents ON checkIns.student_id = allStudents.student_id WHERE checkIns.id = $1`,
+            `SELECT * FROM allStudents WHERE student_id = $1`,
             [studentId]
         )
 
@@ -106,7 +123,7 @@ app.get('/api/get/namesearch/:name', async (req, res) => {
         const name = req.params.name;
 
         const result = await pool.query(
-            `SELECT * FROM checkIns JOIN allStudents ON checkIns.student_id = allStudents.student_id WHERE allStudents.name ILIKE $1`,
+            `SELECT * FROM allStudents WHERE name ILIKE $1`,
             [`%${name}%`]
         )
 
@@ -122,34 +139,13 @@ app.get('/api/get/namesearch/:name', async (req, res) => {
 })
 
 app.post('/api/edit-status', requireAuth, async (req, res) => {
-  try {
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(req.body),
-    });
-
-    const text = await response.text();
-    console.log('Response status:', response.status);
-    console.log('Response from Google Apps Script:', text);
-
-    const data = JSON.parse(text);
-
-    res.json(data);
-  } catch (error) {
-    console.log('Error', error);
-    res.status(500).json({ error: 'Server Error' });
-  }
-});
-app.post('/api/edit-status', async (req, res) => {
     try{
-        const { student_id, is_handed_out, is_purchased } = req.body;
+        const { studentID, status } = req.body;
+        const is_handed_out = status === 'claimed';
 
         const result = await pool.query(
-            `UPDATE checkIns SET is_handed_out = $1, is_purchased = $2 WHERE student_id = $3 RETURNING *`,
-            [is_handed_out, is_purchased, student_id]
+            `UPDATE allStudents SET is_handed_out = $1 WHERE student_id = $2 RETURNING *`,
+            [is_handed_out, studentID]
         )
 
         if (result.rows.length === 0){

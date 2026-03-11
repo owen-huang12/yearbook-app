@@ -1,37 +1,9 @@
 import { useState, useEffect } from "react"
 import Profile from "./components/Profile.jsx"
+import LoginForm from "./components/LoginForm.jsx"
 
 const API_URL = "http://localhost:3002"
 const TOKEN_KEY = "yearbook-auth-token"
-
-function LoginForm({ username, password, onUsernameChange, onPasswordChange, onSubmit, error, loading }) {
-  return (
-    <div className="auth-wrapper">
-      <h1>Yearbook distribution app</h1>
-      <form className="auth-form" onSubmit={onSubmit}>
-        <h3>Authorized Sign In</h3>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(event) => onUsernameChange(event.target.value)}
-          autoComplete="username"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(event) => onPasswordChange(event.target.value)}
-          autoComplete="current-password"
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Signing in..." : "Sign in"}
-        </button>
-        {error ? <p className="auth-error">{error}</p> : null}
-      </form>
-    </div>
-  )
-}
 
 export default function App() {
   const [studentIDsearch, setStudentIDsearch] = useState("")
@@ -67,6 +39,10 @@ export default function App() {
       throw new Error("Session expired. Please sign in again.")
     }
 
+    if (!result.ok){
+      throw new Error(`Request failed (${result.status})`)
+    }
+
     return result
   }
 
@@ -87,15 +63,13 @@ export default function App() {
   }, [authToken])
 
   const updateStudentStatus = async (studentID, newStatus) => {
-    setStudentDisplayInformation((prev = []) => {
-      return prev.map((student) => {
-        return student.studentID.toString() === studentID.toString()
+    setStudentDisplayInformation(prev => 
+      prev.map(student => 
+        student.studentID.toString() === studentID.toString()
           ? { ...student, status: newStatus }
           : student
-      })
-    })
-
-    setResponse(`Student ${studentID} marked as ${newStatus}`)
+      )
+    )
 
     try {
       await authorizedFetch("/api/edit-status", {
@@ -103,8 +77,9 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentID, status: newStatus }),
       })
+      setResponse(`Student ${studentID} marked as ${newStatus}`)
     } catch (error) {
-      setResponse(error.message || "Error saving status")
+      setResponse(error.message)
     }
   }
 
