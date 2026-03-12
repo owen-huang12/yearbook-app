@@ -2,17 +2,27 @@
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  overscroll-behavior: none;
 }
 
 body {
   margin: 0;
-  padding: 0 0 24px;
+  padding: 0;
+  background-image: url('./assets/background.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  overflow: hidden;
+  height: 100vh;
 }
+
+
 
 h1, h3 {
   font-family: "Reem Kufi", sans-serif;
   font-weight: 500;
-  text-align: center;
+
 }
 
 p {
@@ -26,14 +36,10 @@ input {
   padding: 10px 12px;
   font-size: 20px;
   border-radius: 6px;
-  text-align: center;
   border: 1px solid #bbb;
 }
 
-.center-container {
-  display: flex;
-  justify-content: center;
-}
+
 
 header {
   display: flex;
@@ -94,19 +100,73 @@ header {
   font-weight: 600;
 }
 
+.main-layout {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  height: 100vh;
+  padding: 40px;
+  align-items: flex-start;
+  /* background: rgba(255, 255, 255, 0.25); */
+  overflow: hidden;
+}
+
+.handout-information-wrapper{
+  background: rgba(255, 255, 255, 0.568);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  height: calc(100vh - 80px);
+  padding: 40px;
+}
+
+.display-information-panel {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 40px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .display-information-wrapper {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  height: calc(100vh - 80px);
+  padding: 40px;
+}
+
+.handout-information-wrapper {
+  flex: 1;
+}
+
+.display-information-wrapper {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+.profiles-scroll {
+  flex: 1;
+  overflow-y: auto;
+  width: 100%;
+  margin-top: 12px;
+}
+
 .profile {
   display: flex;
-  width: min(1000px, 96vw);
+  width: 100%;
   min-height: 67px;
   align-items: center;
   justify-content: center;
-  background: #f0ba47;
+  background: transparent;
   padding: 18px;
   gap: 43px;
 }

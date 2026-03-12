@@ -9,6 +9,7 @@ export default function App() {
   const [studentIDsearch, setStudentIDsearch] = useState("")
   const [response, setResponse] = useState("")
   const [studentDisplayInformation, setStudentDisplayInformation] = useState()
+  const [search, setSearch] = useState("");
 
   const [authToken, setAuthToken] = useState(localStorage.getItem(TOKEN_KEY) || "")
   const [username, setUsername] = useState("")
@@ -147,39 +148,50 @@ export default function App() {
 
   return (
     <>
-      <header>
-        <h1>Yearbook distribution app</h1>
-        <button className="logout-button" onClick={handleLogout}>Log out</button>
-      </header>
-      <div className="handout-information-wrapper">
-        <h3>HANDOUT YEARBOOK</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="center-container">
-            <input
-              type="text"
-              id="student-id-field"
-              onChange={(event) => {
-                setStudentIDsearch(event.target.value)
-              }}
-              value={studentIDsearch}
-              autoComplete="off"
-            />
-          </div>
-        </form>
-        <p style={{ textAlign: "center" }}>
-          Enter the student ID of the student you are handing out the yearbook for either by
-          scanning their ID bar with the scanner, or entering it manually.
-        </p>
-      </div>
-      <div className="display-information-wrapper">
-        <h3>DISTRIBUTION INFORMATION</h3>
-        <div className="results-info">
-          <p style={{ textAlign: "center" }}>{response}</p>
+      <div className="main-layout">
+        <div className="handout-information-wrapper">
+          <h3>HANDOUT YEARBOOK</h3>
+          <form onSubmit={handleSubmit}>
+            <div className="center-container">
+              <input
+                type="text"
+                id="student-id-field"
+                onChange={(event) => {
+                  setStudentIDsearch(event.target.value)
+                }}
+                value={studentIDsearch}
+                autoComplete="off"
+              />
+            </div>
+          </form>
+          <button className="logout-button" onClick={handleLogout}>Log out</button>
         </div>
-        {studentDisplayInformation?.map((student) => (
-          <Profile key={student.studentID} {...student} update={updateStudentStatus} />
-        ))}
+
+        <div className="display-information-wrapper">
+          <div className="display-information-panel">
+              <h3>DISTRIBUTION INFORMATION</h3>
+
+              <p>{response}</p>
+
+              <input 
+                type="text"
+                id="name-search-input"
+                onChange = {(event) => {
+                  setSearch(event.target.value)
+                }}
+                value={search}
+                autoComplete="off"
+              />
+
+              <div className="profiles-scroll">
+                {studentDisplayInformation?.map((student) => (
+                  <Profile key={student.studentID} {...student} update={updateStudentStatus} />
+                ))}
+              </div>
+          </div>
+        </div>
       </div>
+      
     </>
   )
 }
