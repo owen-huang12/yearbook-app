@@ -11,6 +11,8 @@ const pool = new Pool({
     connectionString: DB_DATABASE_URL,
 })
 
+console.log('Database url: ' + DB_DATABASE_URL);
+
 const app = express();
 const PORT = 3002;
 
@@ -18,6 +20,8 @@ const AUTH_USERNAME = process.env.AUTH_USERNAME;
 const AUTH_PASSWORD = process.env.AUTH_PASSWORD;
 const SESSION_TTL_MS = Number(process.env.SESSION_TTL_MS || 1000 * 60 * 60 * 8);
 const sessions = new Map();
+const DEFAULT_PAGE_SIZE = 20;
+const MAX_PAGE_SIZE = 100;
 
 app.use(cors());
 app.use(express.json());
@@ -81,22 +85,79 @@ app.post('/api/logout', requireAuth, (req, res) => {
 
 app.get('/api/get', requireAuth, async (req, res) => {
     try {
-        const result = await pool.query(
-            `SELECT student_id, name, is_handed_out, is_purchased FROM allStudents`
-        );
+        const parsedLimit = Number.parseInt(req.query.limit, 10);
+        const parsedOffset = Number.parseInt(req.query.offset, 10);
+        const limit = Number.isFinite(parsedLimit)
+          ? Math.min(Math.max(parsedLimit, 1), MAX_PAGE_SIZE)
+          : DEFAULT_PAGE_SIZE;
+        const offset = Number.isFinite(parsedOffset)
+          ? Math.max(parsedOffset, 0)
+          : 0;
 
+        const [studentsResult, countResult] = await Promise.all([
+          pool.query(
+            `
+              SELECT student_id, name, is_handed_out, is_purchased
+              FROM allStudents
+              ORDER BY name ASC, student_id ASC
+              LIMIT $1 OFFSET $2
+            `,
+            [limit, offset],
+          ),
+          pool.query(`SELECT COUNT(*)::int AS total FROM allStudents`),
+        ]);
+
+        const data = studentsResult.rows.map(row => ({
+            studentID: row.student_id,
+            name: row.name,
+            status: row.is_handed_out ? 'claimed' : row.is_purchased ? 'purchased' : 'not purchased',
+        }));
+        const total = countResult.rows[0]?.total ?? 0;
+
+        res.json({
+          data,
+          pagination: {
+            limit,
+            offset,
+            total,
+            hasMore: offset + data.length < total,
+          },
+        });
+    } catch (error) {
+        console.log("Error", error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
+app.get('/api/get/namesearch', requireAuth, async (req, res) => {
+    try{
+        const search = String(req.query.q || '').trim();
+
+        if (!search) {
+            return res.json({ data: [] });
+        }
+
+        const result = await pool.query(
+            `
+              SELECT student_id, name, is_handed_out, is_purchased
+              FROM allStudents
+              WHERE name ILIKE $1
+              ORDER BY name ASC, student_id ASC
+            `,
+            [`%${search}%`]
+        )
         const data = result.rows.map(row => ({
             studentID: row.student_id,
             name: row.name,
             status: row.is_handed_out ? 'claimed' : row.is_purchased ? 'purchased' : 'not purchased',
         }));
 
-        res.json({ data });
+        res.json({ data })
     } catch (error) {
         console.log("Error", error);
-        res.status(500).json({ error: 'Server Error' });
+        res.status(500).json({error: 'Server Error'});
     }
-});
+})
 
 app.get('/api/get/:id', requireAuth, async (req, res) => {
     try{
@@ -112,26 +173,6 @@ app.get('/api/get/:id', requireAuth, async (req, res) => {
         }
 
         res.json(result.rows[0])
-    } catch (error) {
-        console.log("Error", error);
-        res.status(500).json({error: 'Server Error'});
-    }
-})
-
-app.get('/api/get/namesearch/:name', async (req, res) => {
-    try{
-        const name = req.params.name;
-
-        const result = await pool.query(
-            `SELECT * FROM allStudents WHERE name ILIKE $1`,
-            [`%${name}%`]
-        )
-
-        if (result.rows.length === 0){
-            return res.status(404).json({error: 'No students found'})
-        }
-
-        res.json(result.rows)
     } catch (error) {
         console.log("Error", error);
         res.status(500).json({error: 'Server Error'});

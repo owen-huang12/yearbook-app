@@ -4,12 +4,17 @@ import LoginForm from "./components/LoginForm.jsx"
 
 const API_URL = "http://localhost:3002"
 const TOKEN_KEY = "yearbook-auth-token"
+const PAGE_SIZE = 20
 
 export default function App() {
   const [studentIDsearch, setStudentIDsearch] = useState("")
   const [response, setResponse] = useState("")
-  const [studentDisplayInformation, setStudentDisplayInformation] = useState()
-  const [search, setSearch] = useState("");
+  const [studentDisplayInformation, setStudentDisplayInformation] = useState([])
+  const [search, setSearch] = useState("")
+  const [studentsOffset, setStudentsOffset] = useState(0)
+  const [hasMoreStudents, setHasMoreStudents] = useState(true)
+  const [isLoadingStudents, setIsLoadingStudents] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
 
   const [authToken, setAuthToken] = useState(localStorage.getItem(TOKEN_KEY) || "")
   const [username, setUsername] = useState("")
@@ -21,6 +26,8 @@ export default function App() {
     setAuthToken("")
     localStorage.removeItem(TOKEN_KEY)
     setStudentDisplayInformation([])
+    setStudentsOffset(0)
+    setHasMoreStudents(true)
     setResponse("")
   }
 
@@ -47,25 +54,78 @@ export default function App() {
     return result
   }
 
-  const fetchAllStudents = async () => {
+  const fetchStudentsPage = async ({ offset = 0, append = false } = {}) => {
+    setIsLoadingStudents(true)
+
     try {
-      const result = await authorizedFetch("/api/get")
+      const result = await authorizedFetch(`/api/get?limit=${PAGE_SIZE}&offset=${offset}`)
       const data = await result.json()
-      setStudentDisplayInformation(data.data || [])
+      const students = data.data || []
+      const nextOffset = offset + students.length
+
+      setStudentDisplayInformation((prev) => {
+        if (!append) {
+          return students
+        }
+
+        return [...prev, ...students]
+      })
+      setStudentsOffset(nextOffset)
+      setHasMoreStudents(Boolean(data.pagination?.hasMore))
     } catch (error) {
       setResponse(error.message || "Could not load students")
+    } finally {
+      setIsLoadingStudents(false)
+    }
+  }
+
+  const fetchStudentsByName = async (searchTerm) => {
+    setIsLoadingStudents(true)
+
+    try {
+      const result = await authorizedFetch(`/api/get/namesearch?q=${encodeURIComponent(searchTerm)}`)
+      const data = await result.json()
+
+      setStudentDisplayInformation(data.data || [])
+      setStudentsOffset(0)
+      setHasMoreStudents(false)
+    } catch (error) {
+      setResponse(error.message || "Could not search students")
+    } finally {
+      setIsLoadingStudents(false)
     }
   }
 
   useEffect(() => {
-    if (authToken) {
-      fetchAllStudents()
+    if (!authToken) {
+      return
     }
-  }, [authToken])
+
+    const trimmedSearch = search.trim()
+
+    if (!trimmedSearch) {
+      setIsSearching(false)
+      setStudentDisplayInformation([])
+      setStudentsOffset(0)
+      setHasMoreStudents(true)
+      fetchStudentsPage()
+      return
+    }
+
+    setIsSearching(true)
+
+    const timeoutId = window.setTimeout(() => {
+      fetchStudentsByName(trimmedSearch)
+    }, 250)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [authToken, search])
 
   const updateStudentStatus = async (studentID, newStatus) => {
-    setStudentDisplayInformation(prev => 
-      prev.map(student => 
+    setStudentDisplayInformation(prev =>
+      prev.map(student =>
         student.studentID.toString() === studentID.toString()
           ? { ...student, status: newStatus }
           : student
@@ -132,6 +192,23 @@ export default function App() {
     clearAuth()
   }
 
+  const handleLoadMore = () => {
+    if (isSearching || isLoadingStudents || !hasMoreStudents) {
+      return
+    }
+
+    fetchStudentsPage({ offset: studentsOffset, append: true })
+  }
+
+  const handleProfilesScroll = (event) => {
+    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight
+
+    if (distanceFromBottom <= 80) {
+      handleLoadMore()
+    }
+  }
+
   if (!authToken) {
     return (
       <LoginForm
@@ -173,21 +250,23 @@ export default function App() {
 
               <p>{response}</p>
 
-              <input 
+              <input
                 type="text"
                 id="name-search-input"
-                onChange = {(event) => {
+                placeholder="Search by student name"
+                onChange={(event) => {
                   setSearch(event.target.value)
                 }}
                 value={search}
                 autoComplete="off"
               />
 
-              <div className="profiles-scroll">
+              <div className="profiles-scroll" onScroll={handleProfilesScroll}>
                 {studentDisplayInformation?.map((student) => (
                   <Profile key={student.studentID} {...student} update={updateStudentStatus} />
                 ))}
               </div>
+              {isLoadingStudents ? <p className="loading-more">Loading...</p> : null}
           </div>
         </div>
       </div>

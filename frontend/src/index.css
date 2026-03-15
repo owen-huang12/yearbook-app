@@ -160,6 +160,12 @@ header {
   margin-top: 12px;
 }
 
+.loading-more {
+  margin-top: 12px;
+  align-self: center;
+  font-family: "Raleway", sans-serif;
+}
+
 .profile {
   display: flex;
   width: 100%;
