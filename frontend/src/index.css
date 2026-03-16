@@ -58,6 +58,136 @@ header {
   cursor: pointer;
 }
 
+/* Portal auth pages (login + create account) */
+
+.portal-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.portal-card {
+  width: min(480px, 92vw);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 4px;
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.portal-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 16px;
+}
+
+.portal-title {
+  font-family: "Reem Kufi", sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 1.5px;
+  text-align: center;
+  color: #222;
+  margin-bottom: 32px;
+}
+
+.portal-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.portal-label {
+  font-family: "Raleway", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #444;
+  margin-bottom: 6px;
+  margin-top: 16px;
+}
+
+.portal-label:first-child {
+  margin-top: 0;
+}
+
+.portal-input {
+  width: 100%;
+  height: 46px;
+  padding: 10px 14px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: rgba(255, 255, 255, 0.85);
+  font-family: "Raleway", sans-serif;
+}
+
+.portal-input:focus {
+  outline: none;
+  border-color: #999;
+}
+
+.portal-button {
+  margin-top: 28px;
+  width: 60%;
+  align-self: center;
+  height: 50px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(230, 230, 230, 0.8);
+  color: #444;
+  font-family: "Reem Kufi", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.portal-button:hover {
+  background: rgba(220, 220, 220, 0.95);
+}
+
+.portal-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.portal-error {
+  margin: 12px 0 0;
+  color: #b00020;
+  font-weight: 600;
+  text-align: center;
+  font-family: "Raleway", sans-serif;
+}
+
+.portal-switch {
+  margin-top: 20px;
+  font-family: "Raleway", sans-serif;
+  font-size: 14px;
+  color: #555;
+}
+
+.portal-link {
+  background: none;
+  border: none;
+  color: #1c5ac4;
+  font-family: "Raleway", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+/* Legacy auth styles (kept for reference) */
+
 .auth-wrapper {
   min-height: 100vh;
   display: flex;

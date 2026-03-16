@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import Profile from "./components/Profile.jsx"
 import LoginForm from "./components/LoginForm.jsx"
+import CreateAccount from "./components/CreateAccount.jsx"
 
 const API_URL = "http://localhost:3002"
 const TOKEN_KEY = "yearbook-auth-token"
@@ -21,6 +22,7 @@ export default function App() {
   const [password, setPassword] = useState("")
   const [authError, setAuthError] = useState("")
   const [isAuthenticating, setIsAuthenticating] = useState(false)
+  const [page, setPage] = useState("login") // "login" or "create-account"
 
   const clearAuth = () => {
     setAuthToken("")
@@ -210,6 +212,12 @@ export default function App() {
   }
 
   if (!authToken) {
+    if (page === "create-account") {
+      return (
+        <CreateAccount onBackToLogin={() => setPage("login")} />
+      )
+    }
+
     return (
       <LoginForm
         username={username}
@@ -219,6 +227,7 @@ export default function App() {
         onSubmit={handleLogin}
         error={authError}
         loading={isAuthenticating}
+        onCreateAccount={() => setPage("create-account")}
       />
     )
   }

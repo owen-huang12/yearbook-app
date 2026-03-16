@@ -13,6 +13,14 @@ CREATE TABLE checkIns(
     FOREIGN KEY (student_id) REFERENCES allStudents(student_id)
 );
 
+CREATE TABLE users(
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+)
+
 INSERT INTO allStudents (student_id, name, is_handed_out, is_purchased) 
 VALUES
 (100032101, 'Aisha Patel', false, true),

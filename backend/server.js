@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 
 const { Pool } = require('pg');
 
@@ -58,6 +59,16 @@ function requireAuth(req, res, next) {
   req.user = { username: session.username, token };
   next();
 }
+
+app.post('/api/register', async (req, res) => {
+  const { email, username, password } = req.body;
+
+  const result = pool.query(
+    'SELECT * FROM users WHERE users.email = $1',
+    [email]
+  )
+
+})
 
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body || {};

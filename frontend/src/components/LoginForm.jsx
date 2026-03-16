@@ -1,28 +1,45 @@
-export default function LoginForm({ username, password, onUsernameChange, onPasswordChange, onSubmit, error, loading }) {
+import spartanLogo from "../assets/spartan-logo.png"
+
+export default function LoginForm({ username, password, onUsernameChange, onPasswordChange, onSubmit, error, loading, onCreateAccount }) {
   return (
-    <div className="auth-wrapper">
-      <h1>Yearbook distribution app</h1>
-      <form className="auth-form" onSubmit={onSubmit}>
-        <h3>Authorized Sign In</h3>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(event) => onUsernameChange(event.target.value)}
-          autoComplete="username"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(event) => onPasswordChange(event.target.value)}
-          autoComplete="current-password"
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Signing in..." : "Sign in"}
-        </button>
-        {error ? <p className="auth-error">{error}</p> : null}
-      </form>
+    <div className="portal-wrapper">
+      <div className="portal-card">
+        <img src={spartanLogo} alt="Logo" className="portal-logo" />
+        <h1 className="portal-title">YEARBOOK DISTRIBUTION PORTAL</h1>
+
+        <form className="portal-form" onSubmit={onSubmit}>
+          <label className="portal-label">Enter username</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(event) => onUsernameChange(event.target.value)}
+            className="portal-input"
+            autoComplete="username"
+          />
+
+          <label className="portal-label">Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(event) => onPasswordChange(event.target.value)}
+            className="portal-input"
+            autoComplete="current-password"
+          />
+
+          <button type="submit" className="portal-button" disabled={loading}>
+            {loading ? "SIGNING IN..." : "SIGN IN"}
+          </button>
+
+          {error ? <p className="portal-error">{error}</p> : null}
+        </form>
+
+        <p className="portal-switch">
+          Don't have an account?{" "}
+          <button type="button" className="portal-link" onClick={onCreateAccount}>
+            Create account
+          </button>
+        </p>
+      </div>
     </div>
   )
 }
