@@ -17,8 +17,7 @@ console.log('Database url: ' + DB_DATABASE_URL);
 const app = express();
 const PORT = 3002;
 
-const AUTH_USERNAME = process.env.AUTH_USERNAME;
-const AUTH_PASSWORD = process.env.AUTH_PASSWORD;
+
 const SESSION_TTL_MS = Number(process.env.SESSION_TTL_MS || 1000 * 60 * 60 * 8);
 const sessions = new Map();
 const DEFAULT_PAGE_SIZE = 20;
@@ -42,51 +41,101 @@ function getBearerToken(authHeader = '') {
   return authHeader.slice(7).trim();
 }
 
-function requireAuth(req, res, next) {
-  const token = getBearerToken(req.headers.authorization);
+async function requireAuth(req, res, next) {
+  try {
+    const token = getBearerToken(req.headers.authorization);
 
-  if (!token || !sessions.has(token)) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    if (!token || !sessions.has(token)) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const session = sessions.get(token);
+
+    if (session.expiresAt < Date.now()) {
+      sessions.delete(token);
+      return res.status(401).json({ error: 'Session expired' });
+    }
+
+    const result = await pool.query(
+      'SELECT username, email FROM users WHERE username = $1',
+      [session.username]
+    );
+
+    if (result.rows.length === 0) {
+      sessions.delete(token);
+      return res.status(401).json({ error: 'User no longer exists' });
+    }
+
+    req.user = { username: result.rows[0].username, email: result.rows[0].email, token };
+    next();
+  } catch (error) {
+    console.log('Error', error);
+    res.status(500).json({ error: 'Server Error' });
   }
-
-  const session = sessions.get(token);
-
-  if (session.expiresAt < Date.now()) {
-    sessions.delete(token);
-    return res.status(401).json({ error: 'Session expired' });
-  }
-
-  req.user = { username: session.username, token };
-  next();
 }
 
+// function that is the registering function 
 app.post('/api/register', async (req, res) => {
-  const { email, username, password } = req.body;
+  try {
+    const { email, username, password } = req.body;
 
-  const result = pool.query(
-    'SELECT * FROM users WHERE users.email = $1',
-    [email]
-  )
+    if (!email || !password || !username){
+      return res.status(400).json({ error: 'Missing email, username or password' })
+    }
 
+    const validate = await pool.query(
+      'SELECT * FROM users WHERE users.email = $1',
+      [email]
+    );
+
+    if (validate.rows.length > 0) {
+      return res.status(409).json({ error: 'Email already exists'})
+    }
+    
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    await pool.query(
+      'INSERT INTO users (email, username, password_hash) VALUES ($1, $2, $3)',
+      [email, username, passwordHash]
+    );
+
+    const session = createSession(username);
+    res.status(201).json(session);
+  } catch (error) {
+    console.log('Error', error);
+    res.status(500).json({ error: 'Server Error' });
+  }
 })
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { username, password } = req.body || {};
 
-  if (!AUTH_USERNAME || !AUTH_PASSWORD) {
-    return res.status(500).json({ error: 'Auth is not configured on server' });
-  }
+  try {
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required' });
+    }
 
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password are required' });
-  }
+    const result = await pool.query(
+      'SELECT username, password_hash FROM users WHERE username = $1',
+      [username]
+    );
 
-  if (username !== AUTH_USERNAME || password !== AUTH_PASSWORD) {
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
-  const session = createSession(username);
-  res.json(session);
+    const match = await bcrypt.compare(password, result.rows[0].password_hash);
+
+    if (!match) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const session = createSession(username);
+    res.json(session);
+  } catch (error) {
+    console.log("Server error", error);
+    res.status(500).json({ error: 'Server Error' });
+  }
 });
 
 app.post('/api/logout', requireAuth, (req, res) => {

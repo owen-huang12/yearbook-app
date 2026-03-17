@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import Profile from "./components/Profile.jsx"
 import LoginForm from "./components/LoginForm.jsx"
 import CreateAccount from "./components/CreateAccount.jsx"
+import spartanLogo from "./assets/spartan-logo.png"
 
 const API_URL = "http://localhost:3002"
 const TOKEN_KEY = "yearbook-auth-token"
@@ -126,6 +127,8 @@ export default function App() {
   }, [authToken, search])
 
   const updateStudentStatus = async (studentID, newStatus) => {
+    const previous = studentDisplayInformation
+
     setStudentDisplayInformation(prev =>
       prev.map(student =>
         student.studentID.toString() === studentID.toString()
@@ -142,6 +145,7 @@ export default function App() {
       })
       setResponse(`Student ${studentID} marked as ${newStatus}`)
     } catch (error) {
+      setStudentDisplayInformation(previous)
       setResponse(error.message)
     }
   }
@@ -214,7 +218,13 @@ export default function App() {
   if (!authToken) {
     if (page === "create-account") {
       return (
-        <CreateAccount onBackToLogin={() => setPage("login")} />
+        <CreateAccount
+          onBackToLogin={() => setPage("login")}
+          onRegisterSuccess={(token) => {
+            localStorage.setItem(TOKEN_KEY, token)
+            setAuthToken(token)
+          }}
+        />
       )
     }
 
@@ -236,21 +246,24 @@ export default function App() {
     <>
       <div className="main-layout">
         <div className="handout-information-wrapper">
-          <h3>HANDOUT YEARBOOK</h3>
-          <form onSubmit={handleSubmit}>
-            <div className="center-container">
-              <input
-                type="text"
-                id="student-id-field"
-                onChange={(event) => {
-                  setStudentIDsearch(event.target.value)
-                }}
-                value={studentIDsearch}
-                autoComplete="off"
-              />
-            </div>
+          <img src={spartanLogo} alt="Logo" className="handout-logo" />
+          <h1 className="handout-title">YEARBOOK DISTRIBUTION PORTAL</h1>
+
+          <form onSubmit={handleSubmit} className="handout-form">
+            <label className="handout-label">Student ID</label>
+            <input
+              type="text"
+              id="student-id-field"
+              className="handout-input"
+              onChange={(event) => {
+                setStudentIDsearch(event.target.value)
+              }}
+              value={studentIDsearch}
+              autoComplete="off"
+            />
           </form>
-          <button className="logout-button" onClick={handleLogout}>Log out</button>
+
+          <button className="logout-button" onClick={handleLogout}>LOG OUT</button>
         </div>
 
         <div className="display-information-wrapper">
@@ -259,16 +272,19 @@ export default function App() {
 
               <p>{response}</p>
 
-              <input
-                type="text"
-                id="name-search-input"
-                placeholder="Search by student name"
-                onChange={(event) => {
-                  setSearch(event.target.value)
-                }}
-                value={search}
-                autoComplete="off"
-              />
+
+                <input
+                  type="text"
+                  id="name-search-input"
+                  className="handout-input"
+                  placeholder="Enter student name"
+                  onChange={(event) => {
+                    setSearch(event.target.value)
+                  }}
+                  value={search}
+                  autoComplete="off"
+                />
+              
 
               <div className="profiles-scroll" onScroll={handleProfilesScroll}>
                 {studentDisplayInformation?.map((student) => (

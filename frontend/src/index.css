@@ -48,15 +48,6 @@ header {
   position: relative;
 }
 
-.logout-button {
-  position: absolute;
-  right: 24px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #222;
-  background: #fff;
-  cursor: pointer;
-}
 
 /* Portal auth pages (login + create account) */
 
@@ -70,12 +61,12 @@ header {
 
 .portal-card {
   width: min(480px, 92vw);
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(230, 230, 230, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 4px;
-  padding: 48px 40px;
+  padding: 60px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -108,8 +99,8 @@ header {
   font-family: "Raleway", sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: #444;
-  margin-bottom: 6px;
+  color: #555;
+  margin-bottom: 8px;
   margin-top: 16px;
 }
 
@@ -119,11 +110,11 @@ header {
 
 .portal-input {
   width: 100%;
-  height: 46px;
+  height: 50px;
   padding: 10px 14px;
   font-size: 16px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  border-radius: 12px;
+  border: 1px solid #bbb;
   background: rgba(255, 255, 255, 0.85);
   font-family: "Raleway", sans-serif;
 }
@@ -138,13 +129,13 @@ header {
   width: 60%;
   align-self: center;
   height: 50px;
-  border-radius: 8px;
+  border-radius: 12px;
   border: none;
-  background: rgba(230, 230, 230, 0.8);
-  color: #444;
+  background: rgba(255, 255, 255, 0.8);
+  color: #888;
   font-family: "Reem Kufi", sans-serif;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 2px;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -242,12 +233,16 @@ header {
 }
 
 .handout-information-wrapper{
-  background: rgba(255, 255, 255, 0.568);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(230, 230, 230, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   height: calc(100vh - 80px);
-  padding: 40px;
+  padding: 60px 40px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .display-information-panel {
@@ -255,6 +250,7 @@ header {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+  min-width: 600px;
   padding: 40px;
   flex: 1;
   min-height: 0;
@@ -276,8 +272,64 @@ header {
   flex: 1;
 }
 
+.handout-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 24px;
+}
+
+.handout-title {
+  font-family: "Reem Kufi", sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 1.5px;
+  text-align: center;
+  color: #222;
+  margin-bottom: 40px;
+}
+
+.handout-form {
+  width: 100%;
+}
+
+.handout-label {
+  font-family: "Raleway", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.handout-input {
+  width: 100%;
+  height: 50px;
+  padding: 10px 14px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid #bbb;
+  background: rgba(255, 255, 255, 0.85);
+  font-family: "Raleway", sans-serif;
+}
+
+.logout-button {
+  margin-top: auto;
+  padding: 14px 48px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255, 255, 255, 0.8);
+  color: #888;
+  font-family: "Reem Kufi", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
 .display-information-wrapper {
   flex: 1;
+  min-width: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
