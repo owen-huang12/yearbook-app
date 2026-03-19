@@ -1,6 +1,15 @@
-import spartanLogo from "../assets/spartan-logo.png"
+import spartanLogo from "../assets/spartan-logo.png";
 
-export default function LoginForm({ username, password, onUsernameChange, onPasswordChange, onSubmit, error, loading, onCreateAccount }) {
+export default function LoginForm({
+  username,
+  password,
+  onUsernameChange,
+  onPasswordChange,
+  onSubmit,
+  error,
+  loading,
+  onCreateAccount,
+}) {
   return (
     <div className="portal-wrapper">
       <div className="portal-card">
@@ -35,11 +44,15 @@ export default function LoginForm({ username, password, onUsernameChange, onPass
 
         <p className="portal-switch">
           Don't have an account?{" "}
-          <button type="button" className="portal-link" onClick={onCreateAccount}>
+          <button
+            type="button"
+            className="portal-link"
+            onClick={onCreateAccount}
+          >
             Create account
           </button>
         </p>
       </div>
     </div>
-  )
+  );
 }
