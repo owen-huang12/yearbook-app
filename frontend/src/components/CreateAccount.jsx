@@ -47,7 +47,7 @@ export default function CreateAccount({ onBackToLogin, onRegisterSuccess }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="portal-input"
-            autoComplete="email"
+            autoComplete="off"
             required
           />
 
@@ -57,7 +57,7 @@ export default function CreateAccount({ onBackToLogin, onRegisterSuccess }) {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="portal-input"
-            autoComplete="username"
+            autoComplete="off"
             required
           />
 
