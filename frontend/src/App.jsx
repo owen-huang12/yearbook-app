@@ -1,15 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Profile from "./components/Profile.jsx";
 import LoginForm from "./components/LoginForm.jsx";
 import CreateAccount from "./components/CreateAccount.jsx";
 import spartanLogo from "./assets/spartan-logo.png";
 import PopUp from "./components/PopUp.jsx";
+import scanSound from "./sounds/scan.mp3";
+import errorSound from "./sounds/error.mp3";
 
 const API_URL = "http://localhost:3002";
 const TOKEN_KEY = "yearbook-auth-token";
 const PAGE_SIZE = 20;
 
 export default function App() {
+  const scanAudioRef = useRef(null);
+  const errorAudioRef = useRef(null);
   const [studentIDsearch, setStudentIDsearch] = useState("");
   const [response, setResponse] = useState("");
   const [studentDisplayInformation, setStudentDisplayInformation] = useState(
@@ -136,6 +140,51 @@ export default function App() {
     };
   }, [authToken, search]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const scanAudio = new Audio(scanSound);
+    scanAudio.preload = "auto";
+    scanAudio.volume = 0.5;
+    scanAudioRef.current = scanAudio;
+
+    const errorAudio = new Audio(errorSound);
+    errorAudio.preload = "auto";
+    errorAudio.volume = 0.5;
+    errorAudioRef.current = errorAudio;
+
+    return () => {
+      scanAudio.pause();
+      errorAudio.pause();
+      scanAudioRef.current = null;
+      errorAudioRef.current = null;
+    };
+  }, []);
+
+  const playScanSound = () => {
+    const audio = scanAudioRef.current;
+
+    if (!audio) {
+      return;
+    }
+
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+  };
+
+  const playErrorSound = () => {
+    const audio = errorAudioRef.current;
+
+    if (!audio) {
+      return;
+    }
+
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+  };
+
   const updateStudentStatus = async (studentID, newStatus) => {
     const previous = studentDisplayInformation;
 
@@ -166,6 +215,27 @@ export default function App() {
     event.preventDefault();
     const idToUpdate = studentIDsearch;
 
+    try {
+      const studentResult = await authorizedFetch(`/api/get/${idToUpdate}`);
+      const studentData = await studentResult.json();
+
+      if (studentData.is_handed_out) {
+        setPopUpData({
+          name: studentData.name,
+          studentId: studentData.student_id,
+          status: "error",
+          message: "It has already been handed out",
+        });
+        playErrorSound();
+        setStudentIDsearch("");
+        return;
+      }
+    } catch (error) {
+      setResponse(error.message);
+      setStudentIDsearch("");
+      return;
+    }
+
     const data = await updateStudentStatus(idToUpdate, "claimed");
     if (data) {
       setPopUpData({
@@ -177,6 +247,7 @@ export default function App() {
             ? "purchased"
             : "not purchased",
       });
+      playScanSound();
     }
     setStudentIDsearch("");
   };
@@ -327,6 +398,7 @@ export default function App() {
             name={popUpData.name}
             studentId={popUpData.studentId}
             status={popUpData.status}
+            message={popUpData.message}
             onClose={() => setPopUpData(null)}
           />
         )}

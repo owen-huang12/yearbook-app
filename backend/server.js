@@ -257,7 +257,6 @@ app.post("/api/edit-status", requireAuth, async (req, res) => {
   try {
     const { studentID, status } = req.body;
     const is_handed_out = status === "claimed";
-
     const result = await pool.query(
       `UPDATE allStudents SET is_handed_out = $1 WHERE student_id = $2 RETURNING *`,
       [is_handed_out, studentID],

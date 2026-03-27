@@ -460,3 +460,9 @@ header {
     background: rgba(190, 217, 255, 0.92);
     border-color: rgba(0, 90, 160, 0.35);
 }
+
+.popup-status.error {
+    background: rgba(255, 219, 219, 0.94);
+    border-color: rgba(170, 40, 40, 0.35);
+    color: #8f1f1f;
+}

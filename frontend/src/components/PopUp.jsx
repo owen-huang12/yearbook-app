@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-export default function PopUp({ name, studentId, status, onClose }) {
+export default function PopUp({ name, studentId, status, message, onClose }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
@@ -14,7 +14,7 @@ export default function PopUp({ name, studentId, status, onClose }) {
       <div className="popup-card">
         <p className="popup-name">{name}</p>
         <p className="popup-id">{studentId}</p>
-        <p className={`popup-status ${status}`}>{status}</p>
+        <p className={`popup-status ${status}`}>{message || status}</p>
       </div>
     </div>
   );
