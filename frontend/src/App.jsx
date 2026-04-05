@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Profile from "./components/Profile.jsx";
 import LoginForm from "./components/LoginForm.jsx";
-import CreateAccount from "./components/CreateAccount.jsx";
 import spartanLogo from "./assets/spartan-logo.png";
 import PopUp from "./components/PopUp.jsx";
 import scanSound from "./sounds/scan.mp3";
@@ -33,7 +32,6 @@ export default function App() {
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const [page, setPage] = useState("login"); // "login" or "create-account"
 
   const clearAuth = () => {
     setAuthToken("");
@@ -310,18 +308,6 @@ export default function App() {
   };
 
   if (!authToken) {
-    if (page === "create-account") {
-      return (
-        <CreateAccount
-          onBackToLogin={() => setPage("login")}
-          onRegisterSuccess={(token) => {
-            localStorage.setItem(TOKEN_KEY, token);
-            setAuthToken(token);
-          }}
-        />
-      );
-    }
-
     return (
       <LoginForm
         username={username}
@@ -331,7 +317,6 @@ export default function App() {
         onSubmit={handleLogin}
         error={authError}
         loading={isAuthenticating}
-        onCreateAccount={() => setPage("create-account")}
       />
     );
   }

@@ -8,7 +8,6 @@ export default function LoginForm({
   onSubmit,
   error,
   loading,
-  onCreateAccount,
 }) {
   return (
     <div className="portal-wrapper">
@@ -41,17 +40,6 @@ export default function LoginForm({
 
           {error ? <p className="portal-error">{error}</p> : null}
         </form>
-
-        <p className="portal-switch">
-          Don't have an account?{" "}
-          <button
-            type="button"
-            className="portal-link"
-            onClick={onCreateAccount}
-          >
-            Create account
-          </button>
-        </p>
       </div>
     </div>
   );
