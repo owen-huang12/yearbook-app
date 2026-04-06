@@ -3,6 +3,7 @@ import Profile from "./components/Profile.jsx";
 import LoginForm from "./components/LoginForm.jsx";
 import spartanLogo from "./assets/spartan-logo.png";
 import PopUp from "./components/PopUp.jsx";
+import ErrorPopUp from "./components/ErrorPopUp.jsx";
 import scanSound from "./sounds/scan.mp3";
 import errorSound from "./sounds/error.mp3";
 
@@ -14,7 +15,6 @@ export default function App() {
   const scanAudioRef = useRef(null);
   const errorAudioRef = useRef(null);
   const [studentIDsearch, setStudentIDsearch] = useState("");
-  const [response, setResponse] = useState("");
   const [studentDisplayInformation, setStudentDisplayInformation] = useState(
     [],
   );
@@ -24,6 +24,7 @@ export default function App() {
   const [isLoadingStudents, setIsLoadingStudents] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [popUpData, setPopUpData] = useState(null);
+  const [errorPopUpData, setErrorPopUpData] = useState(null);
 
   const [authToken, setAuthToken] = useState(
     localStorage.getItem(TOKEN_KEY) || "",
@@ -39,7 +40,6 @@ export default function App() {
     setStudentDisplayInformation([]);
     setStudentsOffset(0);
     setHasMoreStudents(true);
-    setResponse("");
   };
 
   const authorizedFetch = async (path, options = {}) => {
@@ -86,7 +86,9 @@ export default function App() {
       setStudentsOffset(nextOffset);
       setHasMoreStudents(Boolean(data.pagination?.hasMore));
     } catch (error) {
-      setResponse(error.message || "Could not load students");
+      // setResponse(error.message || "Could not load students");
+      // if there was an error in the studens being shown -- need to set a paragraph in the search results to be "Could not load students" error
+      console.log(error.message || "Could not load students");
     } finally {
       setIsLoadingStudents(false);
     }
@@ -105,7 +107,8 @@ export default function App() {
       setStudentsOffset(0);
       setHasMoreStudents(false);
     } catch (error) {
-      setResponse(error.message || "Could not search students");
+      // setResponse(error.message || "Could not search students");
+      console.log(error.message || "Could not search students");
     } finally {
       setIsLoadingStudents(false);
     }
@@ -201,11 +204,12 @@ export default function App() {
         body: JSON.stringify({ studentID, status: newStatus }),
       });
       const data = await result.json();
-      setResponse(`Student ${studentID} marked as ${newStatus}`);
+      // setResponse(`Student ${studentID} marked as ${newStatus}`);
       return data;
     } catch (error) {
       setStudentDisplayInformation(previous);
-      setResponse(error.message);
+      // setResponse(error.message);
+      console.log(error.message);
     }
   };
 
@@ -229,7 +233,8 @@ export default function App() {
         return;
       }
     } catch (error) {
-      setResponse(error.message);
+      setErrorPopUpData({ studentId: idToUpdate, error });
+      playErrorSound();
       setStudentIDsearch("");
       return;
     }
@@ -385,6 +390,14 @@ export default function App() {
             status={popUpData.status}
             message={popUpData.message}
             onClose={() => setPopUpData(null)}
+          />
+        )}
+
+        {errorPopUpData && (
+          <ErrorPopUp
+            studentId={errorPopUpData.studentId}
+            error={errorPopUpData.error}
+            onClose={() => setErrorPopUpData(null)}
           />
         )}
       </div>
