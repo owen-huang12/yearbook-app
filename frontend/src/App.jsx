@@ -7,8 +7,8 @@ import ErrorPopUp from "./components/ErrorPopUp.jsx";
 import scanSound from "./sounds/scan.mp3";
 import errorSound from "./sounds/error.mp3";
 
-const API_URL = "http://localhost:3002";
-const TOKEN_KEY = "yearbook-auth-token";
+const VITE_API_URL = import.meta.env.VITE_API_URL; // need to deploy the backend and connect that to vercel
+const TOKEN_KEY = "yearbook-auth-token"; // figure out if this is a thing that we need to have in the .env
 const PAGE_SIZE = 20;
 
 export default function App() {
@@ -48,7 +48,7 @@ export default function App() {
       Authorization: `Bearer ${authToken}`,
     };
 
-    const result = await fetch(`${API_URL}${path}`, {
+    const result = await fetch(`${VITE_API_URL}${path}`, {
       ...options,
       headers,
     });
@@ -261,7 +261,7 @@ export default function App() {
     setIsAuthenticating(true);
 
     try {
-      const result = await fetch(`${API_URL}/api/login`, {
+      const result = await fetch(`${VITE_API_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),

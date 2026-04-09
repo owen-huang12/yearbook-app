@@ -11,6 +11,7 @@ const { Pool } = require("pg");
 const DB_DATABASE_URL = process.env.DB_DATABASE_URL;
 const pool = new Pool({
   connectionString: DB_DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
 });
 
 console.log("Database url: " + DB_DATABASE_URL);
