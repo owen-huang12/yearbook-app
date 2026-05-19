@@ -33,6 +33,7 @@ export default function App() {
     const [password, setPassword] = useState("");
     const [authError, setAuthError] = useState("");
     const [isAuthenticating, setIsAuthenticating] = useState(false);
+    const eventSourceRef = useRef(null);
 
     const clearAuth = () => {
         setAuthToken("");
@@ -111,9 +112,31 @@ export default function App() {
         }
     };
 
+    useEffect(() => {}, [authToken]);
+
     useEffect(() => {
         if (!authToken) {
-            return;
+            const es = new EventSource(
+                `${VITE_API_URL}/api/events?token=${authToken}`,
+            );
+
+            es.onmessage = (event) => {
+                const updated = JSON.parse(event.data);
+                setStudentDisplayInformation((prev) =>
+                    prev.map((student) =>
+                        student.studentID.toString() ===
+                        updated.studentID.toString()
+                            ? { ...student, status: updated.status }
+                            : student,
+                    ),
+                );
+            };
+
+            eventSourceRef.current = es;
+
+            return () => {
+                es.close();
+            };
         }
 
         const trimmedSearch = search.trim();
