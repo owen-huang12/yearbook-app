@@ -82,7 +82,7 @@ function requireAuth(req, res, next) {
 
 function broadcastStudentUpdate(student) {
     const payload = JSON.stringify(student);
-    for (const client of setClients) {
+    for (const client of sseClients) {
         client.write(`data: ${payload}\n\n`);
     }
 }
