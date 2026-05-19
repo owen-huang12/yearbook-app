@@ -308,6 +308,10 @@ header {
     font-family: "Raleway", sans-serif;
 }
 
+.handout-input:focus {
+    outline: none;
+}
+
 .logout-button {
     margin-top: auto;
     padding: 14px 48px;
